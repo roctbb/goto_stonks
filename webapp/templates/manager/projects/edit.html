@@ -1,0 +1,15 @@
+{% extends 'manager.html' %}
+
+
+{% block content %}
+
+    <h2>Изменение проекта</h2>
+
+    <form method="POST">
+
+        {% csrf_token %}
+        {{ form }}
+        <button type="submit" class="save btn btn-default">Сохранить</button>
+    </form>
+
+{% endblock %}

@@ -1,0 +1,51 @@
+{% extends 'manager.html' %}
+
+{% block content %}
+
+    <h2>IPO</h2>
+    <table class="table table-striped" style="margin-top: 30px;">
+        <tr>
+            <th>Id</th>
+            <th>Имя</th>
+            <th>Стоимость</th>
+            <th>Действия</th>
+        </tr>
+        {% for project in ipo_projects %}
+            <tr>
+                <td>{{ project.id }}</td>
+                <td>{{ project.name }}</td>
+                <td>{{ project.price }}</td>
+                <td><a href="{% url 'edit_project' pk=project.id %}">Изменить</a></td>
+            </tr>
+        {% endfor %}
+
+    </table>
+
+    <form method="POST">
+
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit" class="save btn btn-default">Добавить</button>
+    </form>
+
+    <h2>Торгуются</h2>
+
+    <table class="table table-striped" style="margin-top: 30px;">
+        <tr>
+            <th>Id</th>
+            <th>Имя</th>
+            <th>Стоимость акции</th>
+            <th>Действия</th>
+        </tr>
+        {% for project in market_projects %}
+            <tr>
+                <td>{{ project.id }}</td>
+                <td>{{ project.name }}</td>
+                <td>{{ project.stock_price }}</td>
+                <td><a href="{% url 'edit_project' pk=project.id %}">Изменить</a></td>
+            </tr>
+        {% endfor %}
+
+    </table>
+
+{% endblock %}
