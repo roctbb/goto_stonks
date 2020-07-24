@@ -1,4 +1,4 @@
-{% extends 'manager.html' %}
+{% extends 'user.html' %}
 
 {% block content %}
 
@@ -10,15 +10,20 @@
         <tr>
             <th>Id</th>
             <th>Имя</th>
-            <th>Стоимость</th>
+            <th>Вложено</th>
             <th>Действия</th>
         </tr>
         {% for project in ipo_projects %}
             <tr>
                 <td>{{ project.id }}</td>
                 <td>{{ project.name }}</td>
-                <td>{{ project.price }}</td>
-                <td></td>
+                <td>{{ project|invest_sum:request.user }}</td>
+                <td>
+                    <form method="POST" action="/invest/{{ project.id }}">
+                        {% csrf_token %}{{ invest_forms|get_item:project.id }}
+                        <button>Вложить</button>
+                    </form>
+                </td>
             </tr>
         {% endfor %}
 
@@ -31,6 +36,7 @@
         <tr>
             <th>Id</th>
             <th>Имя</th>
+            <th>Баланс акций</th>
             <th>Стоимость акции</th>
             <th>Действия</th>
         </tr>
@@ -38,8 +44,38 @@
             <tr>
                 <td>{{ project.id }}</td>
                 <td>{{ project.name }}</td>
-                <td>{{ project.stock_price }}</td>
-                <td><a href="{% url 'edit_project' pk=project.id %}">Изменить</a></td>
+                <td>{{ project|stock_sum:request.user }}
+                    {% if project|frozen_stock_sum:request.user > 0 %}
+                        ( +{{ project|frozen_stock_sum:request.user }} )
+                    {% endif %}
+                    <br>
+                    <small>{{ project|all_stock_sum:request.user|multiply:project.stock_price }} gt</small>
+                </td>
+                <td>
+                    {{ project.stock_price }}
+
+                    {% if project|stock_sum:request.user %}
+                        {% if project.percent_change < 0 %}
+                            <small style="color: red;">- {{ project.percent_change|multiply:-1 }}%</small>
+                        {% else %}
+                            <small style="color: green;">+ {{ project.percent_change }}%</small>
+                        {% endif %}
+                    {% else %}
+                        {% if project|percent:request.user %}
+                            <small style="color: red;">- {{ project|percent:request.user|multiply:-1 }}%</small>
+                        {% else %}
+                            <small style="color: green;">+ {{ project|percent:request.user }}%</small>
+                        {% endif %}
+                    {% endif %}
+                </td>
+                <td>
+                    <small>Покупка: {{ project.stock_price|multiply:1.03 }}<br>
+                        Продажа: {{ project.stock_price|multiply:0.97 }}</small>
+                    <form method="POST" action="/stock/{{ project.id }}">
+                        {% csrf_token %}{{ stock_forms|get_item:project.id }}<input type="submit" name="sell"
+                                                                                    value="Продать"/><input
+                            type="submit" name="buy" value="Купить"/></form>
+                </td>
             </tr>
         {% endfor %}
 

@@ -16,15 +16,23 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 from webapp.views.manager import projects, invites
-from webapp.views.user import auth
+from webapp.views.user import auth, dashboard
+from django.shortcuts import redirect
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('manager/projects', projects.index, name='manager.projects'),
     path('manager/projects/<int:pk>/edit', projects.edit, name='manager.edit_project'),
+    path('manager/projects/<int:pk>/to_market', projects.to_market, name='manager.project_to_market'),
+    path('manager/projects/<int:pk>/to_end', projects.to_end, name='manager.project_to_end'),
+    path('manager/projects/<int:pk>/change', projects.change, name='manager.project_change'),
     path('manager/invites', invites.index, name='manager.invites'),
 
     path('login', auth.login_page, name='login'),
     path('register', auth.register_page, name='register'),
     path('logout', auth.logout_page, name='logout'),
+    path('dashboard', dashboard.index, name='dashboard'),
+    path('invest/<int:pk>', dashboard.invest, name='invest'),
+    path('stock/<int:pk>', dashboard.stock, name='stock'),
+    path('', lambda r:redirect('dashboard'), name='index')
 ]

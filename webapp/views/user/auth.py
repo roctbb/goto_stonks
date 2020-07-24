@@ -23,7 +23,7 @@ def login_page(request):
     else:
         form = AuthenticationForm()
 
-    return render(request, 'user/auth/register.html', {'form': form})
+    return render(request, 'user/auth/login.html', {'form': form})
 
 def register_page(request):
     if request.user.is_authenticated:

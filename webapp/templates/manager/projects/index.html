@@ -14,8 +14,9 @@
             <tr>
                 <td>{{ project.id }}</td>
                 <td>{{ project.name }}</td>
-                <td>{{ project.price }}</td>
-                <td><a href="{% url 'edit_project' pk=project.id %}">Изменить</a></td>
+                <td>{{ project.ipo_price }}</td>
+                <td><a href="{% url 'manager.edit_project' pk=project.id %}">Изменить</a><br>
+                <a href="{% url 'manager.project_to_market' pk=project.id %}">Завершить IPO</a></td>
             </tr>
         {% endfor %}
 
@@ -35,14 +36,24 @@
             <th>Id</th>
             <th>Имя</th>
             <th>Стоимость акции</th>
+            <th>Изменить</th>
             <th>Действия</th>
         </tr>
         {% for project in market_projects %}
             <tr>
                 <td>{{ project.id }}</td>
                 <td>{{ project.name }}</td>
-                <td>{{ project.stock_price }}</td>
-                <td><a href="{% url 'edit_project' pk=project.id %}">Изменить</a></td>
+                <td>{{ project.stock_price }}
+                {% if project.percent_change < 0 %}
+                    <small style="color: red;">- {{ project.percent_change }}%</small>
+                {% else %}
+                    <small style="color: green;">+ {{ project.percent_change }}%</small>
+                {% endif %}
+
+                </td>
+                <td><form method="POST" action="/manager/projects/{{ project.id }}/change">{% csrf_token %}{{ change_forms|get_item:project.id }}<button>Изменить</button> </form></td>
+                <td><a href="{% url 'manager.edit_project' pk=project.id %}">Изменить</a><br>
+                <a href="{% url 'manager.project_to_end' pk=project.id %}">Завершить проект</a></td></td>
             </tr>
         {% endfor %}
 
