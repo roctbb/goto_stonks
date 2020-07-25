@@ -24,8 +24,9 @@
                 <td>{{ project|invest_sum:request.user|roundit:2 }}</td>
                 <td>
                     <form method="POST" action="/invest/{{ project.id }}">
-                        {% csrf_token %}{{ invest_forms|get_item:project.id }}
-                        <button>Вложить</button>
+                        {% csrf_token %}
+                        <ul class="iform">{{ invest_forms|get_item:project.id }}
+                        <li><button>Вложить</button></li></ul>
                     </form>
                 </td>
             </tr>
@@ -80,9 +81,9 @@
                 </td>
                 <td>
                     <form method="POST" action="/stock/{{ project.id }}">
-                        {% csrf_token %}{{ stock_forms|get_item:project.id }}<input type="submit" name="sell"
-                                                                                    value="Продать"/><input
-                            type="submit" name="buy" value="Купить"/></form>
+                        {% csrf_token %}<ul class="iform">{{ stock_forms|get_item:project.id }}<li><input type="submit" name="sell"
+                                                                                    value="Продать"/></li><li><input
+                            type="submit" name="buy" value="Купить"/></li></ul></form>
                 </td>
             </tr>
         {% endfor %}
@@ -92,9 +93,9 @@
         <p>В данный момент на рынке нет доступных акций.</p>
     {% endif %}
 
-    <div class="alert alert-success" role="alert">
+    <div class="alert alert-info" role="alert">
         <h4 class="alert-heading">Памятка</h4>
-        <ol>
+        <ul>
             <li>После регистрации вы автоматически получайте 1000 gt на счет + еще 1000 gt в акциях вашего направления (проекта) после завершения его IPO.</li>
             <li>Средства на счете можно тратить на покупку акций, либо на вложения на этапе IPO.</li>
             <li>Стоимость проекта равна сумме всех вложений в него на этапе IPO + 1000 gt на каждого участника, который принимает в нем участие.</li>
@@ -104,8 +105,8 @@
             <li>Когда кто-либо продает акцию, ее стоимость <i>падает</i> (суммарная стоимость проекта падает на 2% от сделки).</li>
             <li>В конце дня (после обсуждения на оргсобрании), акции проекта могут вырасти или упасть в зависимости от результатов работы за день. Решение принимается директором.</li>
             <li>После завершения проекта стоимость имеющихся акций возвращается на счет.</li>
-            <li>В конце смены заработанные средства можно будет потратить на ацкционе.</li>
-        </ol>
+            <li>В конце смены заработанные средства можно будет потратить на аукционе.</li>
+        </ul>
     </div>
 
 {% endblock %}
