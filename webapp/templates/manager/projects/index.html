@@ -54,6 +54,7 @@
                     </form>
                 </td>
                 <td><a href="{% url 'manager.edit_project' pk=project.id %}">Изменить</a><br>
+                <a href="{% url 'manager.pay_divs' pk=project.id %}">Выплатить дивиденты</a><br>
                     <a href="{% url 'manager.project_to_end' pk=project.id %}">Завершить проект</a></td>
                 </td>
             </tr>

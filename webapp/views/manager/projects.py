@@ -74,5 +74,10 @@ def change(request, pk):
         return HttpResponse('Неудается провести операцию')
 
 
+@staff_member_required
+def pay_divs(request, pk):
+    project = get_object_or_404(Project, pk=pk)
+    project.pay_dividents()
+    return redirect('manager.projects')
 
 

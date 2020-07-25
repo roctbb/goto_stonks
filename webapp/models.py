@@ -56,7 +56,7 @@ class Project(models.Model):
         price = self.stock_price()
 
         for stock in self.stockrecord_set.all():
-            BillingRecord(amount=price * stock.number, comment="trade close of {}".format(self.name), user=stock.user).save()
+            BillingRecord(amount=price * stock.number, comment="Закрытые проекта {}".format(self.name), user=stock.user).save()
 
         self.stockrecord_set.all().delete()
 
@@ -66,7 +66,7 @@ class Project(models.Model):
     def invest(self, user: User, amount):
         if self.state == 'ipo' and get_user_balance(user) >= amount:
             IpoRecord(amount=amount, user=user, project=self).save()
-            BillingRecord(amount=-1 * amount, user=user, comment="Invest in {}".format(self.name)).save()
+            BillingRecord(amount=-1 * amount, user=user, comment="Вложение в проект {}".format(self.name)).save()
             return True
         return False
 
@@ -120,6 +120,11 @@ class Project(models.Model):
     def price(self):
         return self.billingrecord_set.aggregate(Sum('amount')).get('amount__sum', 0) or 0
 
+    def pay_dividents(self):
+        price = self.stock_price()
+        for record in self.stockrecord_set.all():
+            BillingRecord(amount=record.number * price * 0.05, comment="Выплата дивидентов от проекта {}".format(self.name), user=record.user).save()
+
     def change(self, percent):
         StockHistory(price=self.stock_price(), project=self).save()
 
@@ -128,7 +133,7 @@ class Project(models.Model):
         stock_count = self.stockrecord_set.aggregate(Sum('number')).get('number__sum', 0) or 0
         price = self.stock_price()
 
-        BillingRecord(amount=stock_count * price * amount, comment="Manual change", project=self).save()
+        BillingRecord(amount=stock_count * price * amount, comment="Корректировка акций", project=self).save()
 
     def buy(self, user: User, number=1):
         balance = get_user_balance(user)
@@ -136,9 +141,9 @@ class Project(models.Model):
 
         if (price * number) <= balance:
 
-            BillingRecord(amount=price * number, comment="Buy {} by {}".format(number, user.username),
+            BillingRecord(amount=price * number, comment="Покупка  {} акций от {}".format(number, user.username),
                           project=self).save()
-            BillingRecord(amount=-1 * price * number, comment="Buy {} of {}".format(number, self.name),
+            BillingRecord(amount=-1 * price * number, comment="Покупка {} акций проекта {}".format(number, self.name),
                           user=user).save()
 
             if self.stockrecord_set.filter(user=user, can_sell=True).count() > 0:
@@ -168,9 +173,9 @@ class Project(models.Model):
                 else:
                     record.save()
 
-                BillingRecord(amount=-1.02 * price * number, comment="Sell {} by {}".format(number, user.username),
+                BillingRecord(amount=-1.02 * price * number, comment="Продажа {} акций от {}".format(number, user.username),
                               project=self).save()
-                BillingRecord(amount=0.98 * price * number, comment="Buy {} of {}".format(number, self.name), user=user).save()
+                BillingRecord(amount=0.98 * price * number, comment="Продажа {} акций проекта {}".format(number, self.name), user=user).save()
 
                 return True
 
