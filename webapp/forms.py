@@ -8,10 +8,16 @@ from webapp.models import Project, Invite, BillingRecord, get_user_balance
 
 
 class ProjectForm(ModelForm):
+
     class Meta:
         model = Project
         fields = '__all__'
         exclude = ['state']
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["members"].required = False
+        self.fields["members"].choices = list(map(lambda u: (u.id, u.first_name + ' ' + u.last_name), User.objects.all()))
 
 class RegisterForm(UserCreationForm):
     invite = forms.CharField(max_length=30, label="Инвайт")
@@ -21,22 +27,20 @@ class RegisterForm(UserCreationForm):
         fields = ("username", "first_name", "last_name")
         field_classes = {'username': UsernameField}
 
-    def clean_invite(self):
+    def clean(self):
+        super().clean()
+
         invite = self.cleaned_data.get("invite")
-        if Invite.objects.filter(code=invite).count() > 0:
-            Invite.objects.filter(code=invite).all().delete()
-            return invite
-        else:
-            raise forms.ValidationError(
-                "Некорректный инвайт",
-                code='invalid_invite',
-            )
+        if Invite.objects.filter(code=invite).count() == 0:
+            self.add_error('invite', 'Некорректный инвайт')
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
     def save(self, commit=True):
         user = super().save(commit)
+        invite = self.cleaned_data.get("invite")
+        Invite.objects.filter(code=invite).all().delete()
         BillingRecord(amount=1000, comment="Initial", user=user).save()
 
         return user
