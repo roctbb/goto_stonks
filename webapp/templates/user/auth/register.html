@@ -1,5 +1,5 @@
 {% extends 'user.html' %}
-
+{% load crispy_forms_tags %}
 
 {% block content %}
 
@@ -8,8 +8,8 @@
     <form method="POST">
 
         {% csrf_token %}
-        {{  form.as_p  }}
-        <button type="submit" class="save btn btn-default">Создать аккаунт</button>
+        {{  form|crispy }}
+        <button type="submit" class="save btn btn-primary">Создать аккаунт</button>
     </form>
 
 {% endblock %}

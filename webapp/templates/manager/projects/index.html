@@ -1,8 +1,11 @@
 {% extends 'manager.html' %}
-
+{% load crispy_forms_tags %}
 {% block content %}
 
-    <h2>IPO</h2>
+    <h3>IPO
+    <button type="button" class="btn btn-primary btn-sm float-right" data-toggle="modal" data-target="#addModal">
+        Добавить проект
+    </button></h3>
     <table class="table table-striped" style="margin-top: 30px;">
         <tr>
             <th>Id</th>
@@ -16,20 +19,13 @@
                 <td>{{ project.name }}</td>
                 <td>{{ project.ipo_price }}</td>
                 <td><a href="{% url 'manager.edit_project' pk=project.id %}">Изменить</a><br>
-                <a href="{% url 'manager.project_to_market' pk=project.id %}">Завершить IPO</a></td>
+                    <a href="{% url 'manager.project_to_market' pk=project.id %}">Завершить IPO</a></td>
             </tr>
         {% endfor %}
 
     </table>
 
-    <form method="POST">
-
-        {% csrf_token %}
-        {{ form.as_p }}
-        <button type="submit" class="save btn btn-default">Добавить</button>
-    </form>
-
-    <h2>Торгуются</h2>
+    <h3 style="margin-top: 30px;">Торгуются</h3>
 
     <table class="table table-striped" style="margin-top: 30px;">
         <tr>
@@ -44,19 +40,46 @@
                 <td>{{ project.id }}</td>
                 <td>{{ project.name }}</td>
                 <td>{{ project.stock_price }}
-                {% if project.percent_change < 0 %}
-                    <small style="color: red;">- {{ project.percent_change }}%</small>
-                {% else %}
-                    <small style="color: green;">+ {{ project.percent_change }}%</small>
-                {% endif %}
+                    {% if project.percent_change < 0 %}
+                        <small style="color: red;">- {{ project.percent_change }}%</small>
+                    {% else %}
+                        <small style="color: green;">+ {{ project.percent_change }}%</small>
+                    {% endif %}
 
                 </td>
-                <td><form method="POST" action="/manager/projects/{{ project.id }}/change">{% csrf_token %}{{ change_forms|get_item:project.id }}<button>Изменить</button> </form></td>
+                <td>
+                    <form method="POST" action="/manager/projects/{{ project.id }}/change">
+                        {% csrf_token %}{{ change_forms|get_item:project.id }}
+                        <button>Изменить</button>
+                    </form>
+                </td>
                 <td><a href="{% url 'manager.edit_project' pk=project.id %}">Изменить</a><br>
-                <a href="{% url 'manager.project_to_end' pk=project.id %}">Завершить проект</a></td></td>
+                    <a href="{% url 'manager.project_to_end' pk=project.id %}">Завершить проект</a></td>
+                </td>
             </tr>
         {% endfor %}
 
     </table>
+
+    <div class="modal fade" id="addModal" tabindex="-1" role="dialog" aria-labelledby="addModalLabel"
+         aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="addModalLabel">Добавление проекта</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form method="POST">
+                        {% csrf_token %}
+                        {{ form | crispy }}
+                        <button type="submit" class="save btn btn-default btn-success">Добавить</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
 
 {% endblock %}

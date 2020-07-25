@@ -2,14 +2,17 @@
 
 {% block content %}
 
-    <p><strong>Баланс:</strong> {{ balance }} gt</p>
+    <p><strong>Имя:</strong> {{ user.fisrt_name }} {{ user.last_name }}</p>
+    <p><strong>Баланс:</strong> {{ balance|roundit:2 }} gt</p>
 
+    {% if ipo_projects %}
     <h2>IPO</h2>
 
     <table class="table table-striped" style="margin-top: 30px;">
         <tr>
             <th>Id</th>
             <th>Имя</th>
+            <th>Инвесторы</th>
             <th>Вложено</th>
             <th>Действия</th>
         </tr>
@@ -17,7 +20,8 @@
             <tr>
                 <td>{{ project.id }}</td>
                 <td>{{ project.name }}</td>
-                <td>{{ project|invest_sum:request.user }}</td>
+                <td>{{ project.investors_count }}</td>
+                <td>{{ project|invest_sum:request.user|roundit:2 }}</td>
                 <td>
                     <form method="POST" action="/invest/{{ project.id }}">
                         {% csrf_token %}{{ invest_forms|get_item:project.id }}
@@ -29,8 +33,11 @@
 
     </table>
 
+    {% endif %}
 
-    <h2>Торгуются</h2>
+
+    <h2>Акции</h2>
+    {% if market_projects %}
 
     <table class="table table-striped" style="margin-top: 30px;">
         <tr>
@@ -49,28 +56,29 @@
                         ( +{{ project|frozen_stock_sum:request.user }} )
                     {% endif %}
                     <br>
-                    <small>{{ project|all_stock_sum:request.user|multiply:project.stock_price }} gt</small>
+                    <small>{{ project|all_stock_sum:request.user|multiply:project.stock_price|roundit:2 }} gt</small>
                 </td>
                 <td>
-                    {{ project.stock_price }}
+                    {{ project.stock_price|roundit:4 }}
 
                     {% if project|stock_sum:request.user %}
+                        {% if project|percent:request.user %}
+                            <small style="color: red;">- {{ project|percent:request.user }}%</small>
+                        {% else %}
+                            <small style="color: green;">+ {{ project|percent:request.user }}%</small>
+                        {% endif %}
+                    {% else %}
                         {% if project.percent_change < 0 %}
                             <small style="color: red;">- {{ project.percent_change|multiply:-1 }}%</small>
                         {% else %}
                             <small style="color: green;">+ {{ project.percent_change }}%</small>
                         {% endif %}
-                    {% else %}
-                        {% if project|percent:request.user %}
-                            <small style="color: red;">- {{ project|percent:request.user|multiply:-1 }}%</small>
-                        {% else %}
-                            <small style="color: green;">+ {{ project|percent:request.user }}%</small>
-                        {% endif %}
                     {% endif %}
+                    <br>
+                    <small>Покупка: {{ project.stock_price|multiply:1.02|roundit:2 }}<br>
+                        Продажа: {{ project.stock_price|multiply:0.98|roundit:2 }}</small>
                 </td>
                 <td>
-                    <small>Покупка: {{ project.stock_price|multiply:1.03 }}<br>
-                        Продажа: {{ project.stock_price|multiply:0.97 }}</small>
                     <form method="POST" action="/stock/{{ project.id }}">
                         {% csrf_token %}{{ stock_forms|get_item:project.id }}<input type="submit" name="sell"
                                                                                     value="Продать"/><input
@@ -80,5 +88,8 @@
         {% endfor %}
 
     </table>
+    {% else %}
+        <p>В данный момент на рынке нет доступных акций.</p>
+    {% endif %}
 
 {% endblock %}

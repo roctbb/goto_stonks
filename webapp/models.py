@@ -29,19 +29,18 @@ class Project(models.Model):
     def to_market(self):
 
         ask_prices = [record.amount for record in self.iporecord_set.all()]
-        ask_count = len(ask_prices)
         total_price = sum(ask_prices)
 
-        price = find_gcd(list(map(int, ask_prices)) + [int(total_price) // self.members.count()])
+        price = find_gcd(list(map(int, ask_prices)) + [1000])
 
-        BillingRecord(amount=total_price * 2, comment="IPO", project=self).save()
+        BillingRecord(amount=total_price + 1000 * self.members.count(), comment="IPO", project=self).save()
 
         for record in self.iporecord_set.all():
             StockRecord(user=record.user, project=self, number=record.amount // price).save()
             StockHistory(price=price, user=record.user, project=self).save()
 
         for member in self.members.all():
-            StockRecord(user=member, project=self, number=total_price // self.members.count() // price,
+            StockRecord(user=member, project=self, number= 1000 // price,
                         can_sell=False).save()
             StockHistory(price=price, user=member, project=self).save()
 
@@ -57,7 +56,7 @@ class Project(models.Model):
         price = self.stock_price()
 
         for stock in self.stockrecord_set.all():
-            BillingRecord(amount=price * stock.number, comment="trade close", user=stock.user)
+            BillingRecord(amount=price * stock.number, comment="trade close of {}".format(self.name), user=stock.user).save()
 
         self.stockrecord_set.all().delete()
 
@@ -71,22 +70,35 @@ class Project(models.Model):
             return True
         return False
 
+    def investors_count(self):
+        return self.iporecord_set.count()
+
     def percent_change(self):
         if self.stockhistory_set.filter(user=None).count() > 0:
             last_price = self.stockhistory_set.filter(user=None).order_by('id').last().price
-            return round(self.stock_price() * 100 / last_price - 100, 2)
+            if self.stock_price() < last_price:
+                return round(100 - self.stock_price() * 100 / last_price, 2)
+            else:
+                return round(self.stock_price() * 100 / last_price - 100, 2)
         return 0
 
-    def percent_change_by(self, user:User):
+    def percent_change_by(self, user: User):
         if self.stockhistory_set.filter(user=user).count() > 0:
             last_price = self.stockhistory_set.filter(user=user).order_by('id').last().price
+        elif self.stockhistory_set.filter(user=None).count() > 0:
+            last_price = self.stockhistory_set.filter(user=None).order_by('id').last().price
+        else:
+            return 0
+
+        if self.stock_price() < last_price:
+            return round(100 - self.stock_price() * 100 / last_price, 2)
+        else:
             return round(self.stock_price() * 100 / last_price - 100, 2)
-        return 0
 
     def stock_price(self):
         stock_count = self.stockrecord_set.aggregate(Sum('number')).get('number__sum', 0) or 0
         total_price = self.billingrecord_set.aggregate(Sum('amount')).get('amount__sum', 0) or 0
-        return total_price // stock_count
+        return total_price / stock_count
 
     def invested_by(self, user):
         return self.iporecord_set.filter(user=user).aggregate(Sum('amount')).get('amount__sum', 0) or 0
@@ -120,7 +132,7 @@ class Project(models.Model):
 
     def buy(self, user: User, number=1):
         balance = get_user_balance(user)
-        price = self.stock_price() * 1.03
+        price = self.stock_price() * 1.02
 
         if (price * number) <= balance:
 
@@ -135,7 +147,8 @@ class Project(models.Model):
                 record.save()
             else:
                 StockRecord(number=number, user=user, project=self, can_sell=True).save()
-                StockHistory(price=self.stock_price(), user=user, project=self).save()
+
+            StockHistory(price=self.stock_price(), user=user, project=self).save()
 
 
             return True
@@ -155,9 +168,9 @@ class Project(models.Model):
                 else:
                     record.save()
 
-                BillingRecord(amount=-1.03 * price * number, comment="Sell {} by {}".format(number, user.username),
+                BillingRecord(amount=-1.02 * price * number, comment="Sell {} by {}".format(number, user.username),
                               project=self).save()
-                BillingRecord(amount=0.97 * price * number, comment="Buy {} of {}".format(number, self.name), user=user).save()
+                BillingRecord(amount=0.98 * price * number, comment="Buy {} of {}".format(number, self.name), user=user).save()
 
                 return True
 
@@ -191,4 +204,4 @@ class StockRecord(models.Model):
 
 
 def get_user_balance(user: User):
-    return round(user.billingrecord_set.aggregate(Sum('amount')).get('amount__sum', 0) or 0, 2)
+    return user.billingrecord_set.aggregate(Sum('amount')).get('amount__sum', 0) or 0

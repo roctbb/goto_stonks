@@ -8,6 +8,10 @@ from webapp.models import Project, get_user_balance
 from django.template.defaulttags import register
 
 @register.filter
+def roundit(n, s):
+    return round(n, s)
+
+@register.filter
 def get_item(dictionary, key):
     return dictionary.get(key)
 

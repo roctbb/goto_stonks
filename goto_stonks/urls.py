@@ -27,6 +27,7 @@ urlpatterns = [
     path('manager/projects/<int:pk>/to_end', projects.to_end, name='manager.project_to_end'),
     path('manager/projects/<int:pk>/change', projects.change, name='manager.project_change'),
     path('manager/invites', invites.index, name='manager.invites'),
+    path('manager/', lambda r:redirect('manager.projects'), name='manager_index'),
 
     path('login', auth.login_page, name='login'),
     path('register', auth.register_page, name='register'),

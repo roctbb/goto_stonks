@@ -1,5 +1,7 @@
+from bootstrap_select import BootstrapSelect
+from django.contrib.auth.models import User
 from django.forms import ModelForm
-from django.contrib.auth.forms import AuthenticationForm, UserCreationForm
+from django.contrib.auth.forms import AuthenticationForm, UserCreationForm, UsernameField
 from django import forms
 
 from webapp.models import Project, Invite, BillingRecord, get_user_balance
@@ -13,6 +15,11 @@ class ProjectForm(ModelForm):
 
 class RegisterForm(UserCreationForm):
     invite = forms.CharField(max_length=30, label="Инвайт")
+
+    class Meta:
+        model = User
+        fields = ("username", "first_name", "last_name")
+        field_classes = {'username': UsernameField}
 
     def clean_invite(self):
         invite = self.cleaned_data.get("invite")
