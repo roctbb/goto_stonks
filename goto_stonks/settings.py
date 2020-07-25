@@ -114,4 +114,6 @@ PROJECT_ROOT = os.path.normpath(os.path.dirname(__file__))
 STATIC_ROOT = os.path.join(PROJECT_ROOT, 'goto_stonks/static')
 STATIC_URL = '/static/'
 
+print(STATIC_ROOT)
+
 mimetypes.add_type("text/css", ".css", True)
