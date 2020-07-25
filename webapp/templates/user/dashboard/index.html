@@ -115,7 +115,7 @@
 
     <ul>
         {% for record in request.user.billingrecord_set.all %}
-            <li>{{ record.amount }} ({{ record.comment }});</li>
+            <li>{{ record.amount|roundit:2 }} ({{ record.comment }});</li>
         {% endfor %}
     </ul>
 
