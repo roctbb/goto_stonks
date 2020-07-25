@@ -1,3 +1,2 @@
 django~=2.2.6
 django-crispy-forms~=1.8.0
-django-bootstrap-select~=0.1.3
