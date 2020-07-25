@@ -3,12 +3,19 @@
 
 {% block content %}
 
+    <div class="alert alert-success" role="alert">
+        <h4 class="alert-heading">Привет!</h4>
+        <p>Добро пожаловать на <strong>GoTo Stonks</strong> - платформу для торговли акциями интенсивов и проектов в GoTo.</p>
+
+        <p>Для регистрации понадобится инвайт, который можно получить у преподавателя. Не забудь указать настоящее имя и фамилию!</p>
+    </div>
+
     <h2>Вход</h2>
 
     <form method="POST">
 
         {% csrf_token %}
-        {{  form|crispy }}
+        {{ form|crispy }}
         <button type="submit" class="save btn btn-success">Войти</button>
         <a class="btn btn-primary" href="/register">Регистрация</a>
     </form>
