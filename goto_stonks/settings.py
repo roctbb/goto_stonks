@@ -13,6 +13,8 @@ https://docs.djangoproject.com/en/2.2/ref/settings/
 import os
 import os.path
 import sys
+import mimetypes
+
 from goto_stonks.settings_local import *
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
@@ -111,3 +113,5 @@ USE_TZ = True
 PROJECT_ROOT = os.path.normpath(os.path.dirname(__file__))
 STATIC_ROOT = os.path.join(PROJECT_ROOT, 'static')
 STATIC_URL = '/static/'
+
+mimetypes.add_type("text/css", ".css", True)
