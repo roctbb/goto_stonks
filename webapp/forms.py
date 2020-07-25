@@ -81,7 +81,7 @@ class StockForm(forms.Form):
         return False
 
 class ChangeForm(forms.Form):
-    percent = forms.IntegerField(label='Процент', min_value=-100, max_value=100)
+    percent = forms.IntegerField(label='Процент', min_value=-90, max_value=100)
 
     def __init__(self, project, *args, **kwargs):
         super().__init__(*args, **kwargs)
