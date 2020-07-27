@@ -63,8 +63,8 @@
                     {{ project.stock_price|roundit:4 }}
 
                     {% if project|stock_sum:request.user %}
-                        {% if project|percent:request.user %}
-                            <small style="color: red;">- {{ project|percent:request.user }}%</small>
+                        {% if project|percent:request.user < 0 %}
+                            <small style="color: red;">- {{ project|percent:request.user|multiply:-1 }}%</small>
                         {% else %}
                             <small style="color: green;">+ {{ project|percent:request.user }}%</small>
                         {% endif %}
