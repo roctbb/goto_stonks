@@ -77,7 +77,7 @@ class Project(models.Model):
         if self.stockhistory_set.filter(user=None).count() > 0:
             last_price = self.stockhistory_set.filter(user=None).order_by('id').last().price
             if self.stock_price() < last_price:
-                return round(100 - self.stock_price() * 100 / last_price, 2)
+                return -1 * round(100 - self.stock_price() * 100 / last_price, 2)
             else:
                 return round(self.stock_price() * 100 / last_price - 100, 2)
         return 0
@@ -91,7 +91,7 @@ class Project(models.Model):
             return 0
 
         if self.stock_price() < last_price:
-            return round(100 - self.stock_price() * 100 / last_price, 2)
+            return -1 * round(100 - self.stock_price() * 100 / last_price, 2)
         else:
             return round(self.stock_price() * 100 / last_price - 100, 2)
 
