@@ -41,7 +41,7 @@
                 <td>{{ project.name }}</td>
                 <td>{{ project.stock_price }}
                     {% if project.percent_change < 0 %}
-                        <small style="color: red;">- {{ project.percent_change }}%</small>
+                        <small style="color: red;">- {{ project.percent_change|multiply:-1 }}%</small>
                     {% else %}
                         <small style="color: green;">+ {{ project.percent_change }}%</small>
                     {% endif %}
