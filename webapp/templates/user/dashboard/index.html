@@ -64,15 +64,15 @@
 
                     {% if project|stock_sum:request.user %}
                         {% if project|percent:request.user < 0 %}
-                            <small style="color: red;">- {{ project|percent:request.user|multiply:-1 }}%</small>
+                            <small style="color: red;">{{ project|percent:request.user }}%</small>
                         {% else %}
-                            <small style="color: green;">+ {{ project|percent:request.user }}%</small>
+                            <small style="color: green;">+{{ project|percent:request.user }}%</small>
                         {% endif %}
                     {% else %}
                         {% if project.percent_change < 0 %}
-                            <small style="color: red;">- {{ project.percent_change|multiply:-1 }}%</small>
+                            <small style="color: red;">{{ project.percent_change }}%</small>
                         {% else %}
-                            <small style="color: green;">+ {{ project.percent_change }}%</small>
+                            <small style="color: green;">+{{ project.percent_change }}%</small>
                         {% endif %}
                     {% endif %}
                     <br>
