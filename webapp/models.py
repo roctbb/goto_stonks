@@ -139,6 +139,9 @@ class Project(models.Model):
         balance = get_user_balance(user)
         price = self.stock_price() * 1.02
 
+        if number < 1:
+            return False
+
         if (price * number) <= balance:
 
             BillingRecord(amount=price * number, comment="Покупка  {} акций от {}".format(number, user.username),
@@ -155,19 +158,23 @@ class Project(models.Model):
 
             StockHistory(price=self.stock_price(), user=user, project=self).save()
 
-
             return True
         else:
             return False
 
     def sell(self, user: User, number=1):
         price = self.stock_price()
+
+        if number < 1:
+            return False
+
         if self.stocks_by(user) > 0:
 
             record = self.stockrecord_set.filter(user=user, can_sell=True).first()
 
             if record.number >= number:
                 record.number -= number
+
                 if record.number == 0:
                     record.delete()
                 else:

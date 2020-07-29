@@ -17,6 +17,7 @@ from django.contrib import admin
 from django.urls import path
 from webapp.views.manager import projects, invites
 from webapp.views.user import auth, dashboard
+from webapp.views.api import open
 from django.shortcuts import redirect
 
 urlpatterns = [
@@ -36,5 +37,7 @@ urlpatterns = [
     path('dashboard', dashboard.index, name='dashboard'),
     path('invest/<int:pk>', dashboard.invest, name='invest'),
     path('stock/<int:pk>', dashboard.stock, name='stock'),
-    path('', lambda r:redirect('dashboard'), name='index')
+    path('', lambda r:redirect('dashboard'), name='index'),
+
+    path('api/open/prices', open.get_prices, name='api.open.get_prices'),
 ]
