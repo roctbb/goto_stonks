@@ -46,7 +46,7 @@ class RegisterForm(UserCreationForm):
         return user
 
 class IpoInvestForm(forms.Form):
-    amount = forms.IntegerField(label='Сумма', min_value=0)
+    amount = forms.IntegerField(label='Сумма', min_value=1)
 
     def __init__(self, user, project, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -62,7 +62,7 @@ class IpoInvestForm(forms.Form):
 
 
 class StockForm(forms.Form):
-    number = forms.IntegerField(label='Кол-во', min_value=0)
+    number = forms.IntegerField(label='Кол-во', min_value=1)
 
     def __init__(self, user, project, *args, **kwargs):
         super().__init__(*args, **kwargs)
