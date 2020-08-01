@@ -96,15 +96,9 @@ class Project(models.Model):
             return round(self.stock_price() * 100 / last_price - 100, 2)
 
     def stock_price(self):
-
-        last = self.stockhistory_set.last()
-
-        if last:
-            return last.price
-        else:
-            stock_count = self.stockrecord_set.aggregate(Sum('number')).get('number__sum', 0) or 0
-            total_price = self.billingrecord_set.aggregate(Sum('amount')).get('amount__sum', 0) or 0
-            return total_price / stock_count
+        stock_count = self.stockrecord_set.aggregate(Sum('number')).get('number__sum', 0) or 0
+        total_price = self.billingrecord_set.aggregate(Sum('amount')).get('amount__sum', 0) or 0
+        return total_price / stock_count
 
     def invested_by(self, user):
         return self.iporecord_set.filter(user=user).aggregate(Sum('amount')).get('amount__sum', 0) or 0
@@ -143,8 +137,7 @@ class Project(models.Model):
 
     def buy(self, user: User, number=1):
         balance = get_user_balance(user)
-        old_price = self.stock_price()
-        price = old_price * 1.02
+        price = self.stock_price() * 1.02
 
         if number < 1:
             return False
@@ -163,7 +156,7 @@ class Project(models.Model):
             else:
                 StockRecord(number=number, user=user, project=self, can_sell=True).save()
 
-            StockHistory(price=old_price + price * number * 0.025, user=user, project=self).save()
+            StockHistory(price=self.stock_price(), user=user, project=self).save()
 
             return True
         else:
@@ -190,8 +183,6 @@ class Project(models.Model):
                 BillingRecord(amount=-1.02 * price * number, comment="Продажа {} акций от {}".format(number, user.username),
                               project=self).save()
                 BillingRecord(amount=0.98 * price * number, comment="Продажа {} акций проекта {}".format(number, self.name), user=user).save()
-
-                StockHistory(price=price - 0.98 * price * number * 0.025, user=user, project=self).save()
 
                 return True
 
