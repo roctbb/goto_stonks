@@ -17,7 +17,7 @@ from django.contrib import admin
 from django.urls import path
 from webapp.views.manager import projects, invites
 from webapp.views.user import auth, dashboard
-from webapp.views.api import open
+from webapp.views.api import open, robot
 from django.shortcuts import redirect
 
 urlpatterns = [
@@ -40,4 +40,9 @@ urlpatterns = [
     path('', lambda r:redirect('dashboard'), name='index'),
 
     path('api/open/prices', open.get_prices, name='api.open.get_prices'),
+
+    path('api/robot/stocks/', robot.get_projects, name='api.robot.get_projects'),
+    path('api/robot/balance/', robot.get_balance, name='api.robot.get_balance'),
+    path('api/robot/stocks/<int:pk>/buy', robot.buy, name='api.robot.buy'),
+    path('api/robot/stocks/<int:pk>/sell', robot.sell, name='api.robot.sell'),
 ]
