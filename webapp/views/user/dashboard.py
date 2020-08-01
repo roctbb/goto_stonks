@@ -83,4 +83,4 @@ def stock(request, pk):
         form = StockForm(request.user, project, data=request.POST)
         if form.is_valid() and form.save():
             return redirect('dashboard')
-        return HttpResponse('Неудается провести операцию')
+        return HttpResponse('Не удается провести операцию')
