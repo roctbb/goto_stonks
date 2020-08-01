@@ -139,12 +139,14 @@ class Project(models.Model):
         balance = get_user_balance(user)
         price = self.stock_price() * 1.02
 
+        stock_count = self.stockrecord_set.aggregate(Sum('number')).get('number__sum', 1) or 1
+
         if number < 1:
             return False
 
         if (price * number) <= balance:
 
-            BillingRecord(amount=price * number, comment="Покупка  {} акций от {}".format(number, user.username),
+            BillingRecord(amount=price * number * stock_count / 2, comment="Покупка  {} акций от {}".format(number, user.username),
                           project=self).save()
             BillingRecord(amount=-1 * price * number, comment="Покупка {} акций проекта {}".format(number, self.name),
                           user=user).save()
