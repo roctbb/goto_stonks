@@ -46,6 +46,10 @@
                         <small style="color: green;">+ {{ project.percent_change }}%</small>
                     {% endif %}
 
+                    <br>
+                <small>Капитализация: {{ project.price|roundit:1 }}</small><br>
+                <small>Акций: {{ project.stocks_count }}</small>
+
                 </td>
                 <td>
                     <form method="POST" action="/manager/projects/{{ project.id }}/change">
@@ -56,6 +60,27 @@
                 <td><a href="{% url 'manager.edit_project' pk=project.id %}">Изменить</a><br>
                 <a href="{% url 'manager.pay_divs' pk=project.id %}">Выплатить дивиденты</a><br>
                     <a href="{% url 'manager.project_to_end' pk=project.id %}">Завершить проект</a></td>
+                </td>
+            </tr>
+        {% endfor %}
+
+    </table>
+
+    <h3 style="margin-top: 30px;">Пользователи</h3>
+
+    <table class="table table-striped" style="margin-top: 30px;">
+        <tr>
+            <th>Id</th>
+            <th>Имя</th>
+            <th>Баланс</th>
+        </tr>
+        {% for user in users %}
+            <tr>
+                <td>{{ user.id }}</td>
+                <td>{{ project.first_name }} {{ project.last_name }}</td>
+
+                <td>
+                    <strong>{{ user|balance }}</strong>
                 </td>
             </tr>
         {% endfor %}

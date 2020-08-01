@@ -1,3 +1,4 @@
+from django.contrib.auth.models import User
 from django.http import HttpResponse
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.admin.views.decorators import staff_member_required
@@ -5,7 +6,14 @@ from django.contrib.auth.decorators import login_required
 
 
 from webapp.forms import ProjectForm, ChangeForm
-from webapp.models import Project, Invite
+from webapp.models import Project, Invite, get_user_balance
+
+from django.template.defaulttags import register
+
+
+@register.filter
+def balance(user):
+    return get_user_balance(user)
 
 
 @staff_member_required
@@ -23,6 +31,8 @@ def index(request):
     market_projects = Project.objects.filter(state='market').all()
     ended_projects = Project.objects.filter(state='ended').all()
 
+    users = User.objects.all()
+
     change_forms = {}
 
     for project in market_projects:
@@ -34,7 +44,8 @@ def index(request):
         'market_projects': market_projects,
         'ended_projects': ended_projects,
         'form': form,
-        'change_forms': change_forms
+        'change_forms': change_forms,
+        'users':users
     })
 
 @staff_member_required

@@ -109,6 +109,8 @@ class Project(models.Model):
     def stocks_by(self, user):
         return int(self.stockrecord_set.filter(user=user, can_sell=True).aggregate(Sum('number')).get('number__sum', 0) or 0)
 
+    def stocks_count(self):
+        return int(self.stockrecord_set.aggregate(Sum('number')).get('number__sum', 0) or 0)
     def frozen_stocks_by(self, user):
         print(1)
         return int(
@@ -193,19 +195,21 @@ class StockHistory(models.Model):
     price = models.FloatField(verbose_name="Цена", default=0)
     project = models.ForeignKey(Project, on_delete=models.CASCADE, null=True)
     user = models.ForeignKey(User, on_delete=models.CASCADE, null=True)
-    time = models.DateTimeField(auto_now_add=True)
+    time = models.DateTimeField(auto_now_add=True, null=True)
 
 class BillingRecord(models.Model):
     amount = models.FloatField(verbose_name="Сумма", default=0)
     comment = models.CharField(max_length=120, verbose_name="Комментарий", default="")
     user = models.ForeignKey(User, on_delete=models.CASCADE, null=True)
     project = models.ForeignKey(Project, on_delete=models.CASCADE, null=True)
+    time = models.DateTimeField(auto_now_add=True, null=True)
 
 
 class IpoRecord(models.Model):
     amount = models.FloatField(verbose_name="Сумма", default=0)
     user = models.ForeignKey(User, on_delete=models.CASCADE, null=True)
     project = models.ForeignKey(Project, on_delete=models.CASCADE, null=True)
+    time = models.DateTimeField(auto_now_add=True, null=True)
 
 
 class StockRecord(models.Model):
@@ -213,6 +217,7 @@ class StockRecord(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, null=True)
     project = models.ForeignKey(Project, on_delete=models.CASCADE, null=True)
     can_sell = models.BooleanField(default=True, verbose_name="Можно продать")
+    time = models.DateTimeField(auto_now_add=True, null=True)
 
 
 def get_user_balance(user: User):
