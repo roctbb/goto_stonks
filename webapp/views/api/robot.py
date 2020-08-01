@@ -41,6 +41,11 @@ def market_deal(request, pk, type):
     project = Project.objects.get(pk=pk)
     if project:
         number = request.GET.get('number')
+        if project.state != 'market':
+            return JsonResponse({
+                "state": "error",
+                "error": "not on market"
+            }, safe=False)
 
         if not number:
             return JsonResponse({
