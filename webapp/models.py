@@ -143,7 +143,8 @@ class Project(models.Model):
 
     def buy(self, user: User, number=1):
         balance = get_user_balance(user)
-        price = self.stock_price() * 1.02
+        old_price = self.stock_price()
+        price = old_price * 1.02
 
         if number < 1:
             return False
@@ -162,7 +163,7 @@ class Project(models.Model):
             else:
                 StockRecord(number=number, user=user, project=self, can_sell=True).save()
 
-            StockHistory(price=price, user=user, project=self).save()
+            StockHistory(price=old_price + price * number * 0.025, user=user, project=self).save()
 
             return True
         else:
@@ -190,7 +191,7 @@ class Project(models.Model):
                               project=self).save()
                 BillingRecord(amount=0.98 * price * number, comment="Продажа {} акций проекта {}".format(number, self.name), user=user).save()
 
-                StockHistory(price=0.98 * price, user=user, project=self).save()
+                StockHistory(price=price - 0.98 * price * number * 0.025, user=user, project=self).save()
 
                 return True
 
